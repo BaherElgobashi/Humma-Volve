@@ -1,4 +1,5 @@
 
+using Asp.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Training.Contexts;
 
@@ -21,6 +22,25 @@ namespace Training
             builder.Services.AddDbContext<ApplicationDbContext>(options => {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            builder.Services.AddApiVersioning(options =>
+            {
+                // تحديد الإصدار الافتراضي في حال لم يرسله العميل
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+
+                // إرجاع الإصدارات المتاحة في الـ Response Headers (api-supported-versions)
+                options.ReportApiVersions = true;
+
+                // تحديد كيفية قراءة الإصدار (من الرابط URL)
+                options.ApiVersionReader = new UrlSegmentApiVersionReader();
+            })
+                .AddApiExplorer(options =>
+                {
+                    // شكل صيغة الإصدار في الـ URL (مثل 'v'1)
+                    options.GroupNameFormat = "'v'VVV";
+                    options.SubstituteApiVersionInUrl = true;
+                });
 
             var app = builder.Build();
 
