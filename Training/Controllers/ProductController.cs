@@ -8,8 +8,10 @@ using Training.Entities;
 
 namespace Training.Controllers
 {
-    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ProductController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -22,7 +24,7 @@ namespace Training.Controllers
         [HttpGet("Products")]
         [MapToApiVersion("1.0")]
 
-        public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetAllProductsV1()
         {
             var products = await context.Products.ToListAsync();
             var productDtos = products.Select(P => new ProductDto() 
@@ -30,6 +32,23 @@ namespace Training.Controllers
                 Id = P.Id,
                 Name = P.Name,
                 Price = P.Price
+            });
+
+            return Ok(productDtos);
+        }
+
+        [HttpGet("Products")]
+        [MapToApiVersion("2.0")]
+
+        public async Task<ActionResult<IEnumerable<Product>>> GetAllProductsV2()
+        {
+            var products = await context.Products.ToListAsync();
+            var productDtos = products.Select(P => new ProductDto()
+            {
+                Id = P.Id,
+                Name = P.Name,
+                Price = P.Price,
+                BrandName = P.ProductBrand.Name
             });
 
             return Ok(productDtos);
