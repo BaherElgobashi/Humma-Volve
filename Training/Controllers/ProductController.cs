@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Training.Contexts;
@@ -7,7 +8,7 @@ using Training.Entities;
 
 namespace Training.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -19,6 +20,7 @@ namespace Training.Controllers
         }
 
         [HttpGet("Products")]
+        [MapToApiVersion("1.0")]
 
         public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
         {
