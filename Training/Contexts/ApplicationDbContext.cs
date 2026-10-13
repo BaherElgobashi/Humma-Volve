@@ -15,6 +15,6 @@ namespace Training.Contexts
         }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<ProductBrand> ProductBrands { get; set; }
     }
 }

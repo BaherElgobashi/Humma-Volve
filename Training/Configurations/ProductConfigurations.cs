@@ -8,7 +8,7 @@ namespace Training.Configurations
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
-            builder.HasOne(P => P.Brand)
+            builder.HasOne(P => P.ProductBrand)
                 .WithMany()
                 .HasForeignKey(P => P.BrandId);
 

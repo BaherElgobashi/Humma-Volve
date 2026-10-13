@@ -1,6 +1,6 @@
 ﻿namespace Training.Entities
 {
-    public class Brand
+    public class ProductBrand
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

@@ -7,6 +7,6 @@
         public decimal Price { get; set; }
 
         public int BrandId { get; set; }
-        public Brand Brand { get; set; }
+        public ProductBrand ProductBrand { get; set; }
     }
 }
