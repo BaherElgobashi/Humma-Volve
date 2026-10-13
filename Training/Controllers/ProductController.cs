@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Training.Contexts;
+using Training.DTOS;
 using Training.Entities;
 
 namespace Training.Controllers
@@ -22,7 +23,14 @@ namespace Training.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
         {
             var products = await context.Products.ToListAsync();
-            return Ok(products);
+            var productDtos = products.Select(P => new ProductDto() 
+            {
+                Id = P.Id,
+                Name = P.Name,
+                Price = P.Price
+            });
+
+            return Ok(productDtos);
         }
     }
 }
