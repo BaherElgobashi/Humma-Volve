@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Training.Entities;
 namespace Training.Contexts
 {
     public class ApplicationDbContext : DbContext
@@ -12,5 +13,8 @@ namespace Training.Contexts
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
+
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }
