@@ -1,6 +1,6 @@
 ﻿namespace Training.DTOS
 {
-    public class ProductDto
+    public class ProductDtoV1
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

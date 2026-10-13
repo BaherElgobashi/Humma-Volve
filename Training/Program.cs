@@ -1,64 +1,58 @@
-
 using Asp.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Training.Contexts;
 
-namespace Training
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+// إعداد الـ Versioning
+builder.Services.AddApiVersioning(options =>
 {
-    public class Program
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+})
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV"; // يولد v1 و v2
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    // تعريف المستندين
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo { Title = "Training API - V1", Version = "v1" });
+    options.SwaggerDoc("v2", new Microsoft.OpenApi.OpenApiInfo { Title = "Training API - V2", Version = "v2" });
+
+    // فلترة تلقائية: كل Action تذهب للمستند المطابق لإصدارها
+    options.DocInclusionPredicate((docName, apiDesc) =>
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        return apiDesc.GroupName == docName;
+    });
+});
 
-            // Add services to the container.
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddOpenApi();
+var app = builder.Build();
 
-            builder.Services.AddDbContext<ApplicationDbContext>(options => {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-
-            builder.Services.AddApiVersioning(options =>
-            {
-                // تحديد الإصدار الافتراضي في حال لم يرسله العميل
-                options.DefaultApiVersion = new ApiVersion(1, 0);
-                options.AssumeDefaultVersionWhenUnspecified = true;
-
-                // إرجاع الإصدارات المتاحة في الـ Response Headers (api-supported-versions)
-                options.ReportApiVersions = true;
-
-                // تحديد كيفية قراءة الإصدار (من الرابط URL)
-                options.ApiVersionReader = new UrlSegmentApiVersionReader();
-            })
-                .AddApiExplorer(options =>
-                {
-                    // شكل صيغة الإصدار في الـ URL (مثل 'v'1)
-                    options.GroupNameFormat = "'v'VVV";
-                    options.SubstituteApiVersionInUrl = true;
-                });
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Training API v1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "Training API v2");
+    });
 }
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();
