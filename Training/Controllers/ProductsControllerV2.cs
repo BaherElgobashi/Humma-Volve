@@ -20,21 +20,31 @@ namespace Training.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDtoV1>>> GetAllProducts()
+        public async Task<ActionResult<IEnumerable<ProductDtoV2>>> GetAllProducts([FromQuery] int pageIndex =1 , [FromQuery] int pageSize =10 )
         {
+            if (pageIndex < 1)
+                pageIndex = 1;
+
+            if (pageSize < 1 || pageSize >50)
+                pageSize = 10;
+
+
             var products = await context.Products
-                .Include(p => p.ProductBrand)
-                .ToListAsync();
+                .AsNoTracking()
+                .OrderBy(p => p.Id)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize).Select(p => new ProductDtoV2
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    BrandName = p.ProductBrand.Name
+                }).ToListAsync() ;
+               
 
-            var productDtos = products.Select(p => new ProductDtoV1
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                BrandName = p.ProductBrand.Name
-            });
+            
 
-            return Ok(productDtos);
+            return Ok(products);
         }
     }
 }
