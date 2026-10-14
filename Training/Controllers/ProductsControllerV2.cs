@@ -46,5 +46,37 @@ namespace Training.Controllers
 
             return Ok(products);
         }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateProductAsync(int id, [FromBody] ProductDtoV2 productDto)
+        {
+            if (id != productDto.Id)
+            {
+                return BadRequest("Product ID mismatch.");
+            }
+            var product = await context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            product.Name = productDto.Name;
+            product.Price = productDto.Price;
+            // Assuming you have a way to get the ProductBrand by name
+            var brand = await context.ProductBrands.FirstOrDefaultAsync(b => b.Name == productDto.BrandName);
+            if (brand == null)
+            {
+                return BadRequest("Invalid brand name.");
+            }
+            product.BrandId = brand.Id;
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                
+            }
+            return Ok(productDto) ;
+        }
     }
 }
