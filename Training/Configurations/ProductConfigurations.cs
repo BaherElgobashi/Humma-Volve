@@ -18,6 +18,9 @@ namespace Training.Configurations
             // Non-Clustered Index Using Name.
             builder.HasIndex(P => P.Name)
                    .HasDatabaseName("IX_Products_Name");
+
+            // Perform Global Filter For Soft Delete.
+            builder.HasQueryFilter(P => !P.IsDeleted);
         }
     }
 }
