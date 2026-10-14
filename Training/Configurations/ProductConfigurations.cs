@@ -14,6 +14,10 @@ namespace Training.Configurations
 
             builder.Property(P => P.Price)
                 .HasColumnType("decimal(10,3)");
+
+            // Non-Clustered Index Using Name.
+            builder.HasIndex(P => P.Name)
+                   .HasDatabaseName("IX_Products_Name");
         }
     }
 }
